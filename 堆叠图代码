@@ -1,0 +1,54 @@
+library(tidyverse)
+library(ggplot2)
+library(ggtree)
+library(treeio)
+library(ggsci)
+library(cowplot)
+abundance = read.table('all.abundance_uniform_s.tsv', header =  F,comment.char='#',row.names=1)#导入数据
+group=read.table('group.list', header =  F,comment.char="#")
+colnames(abundance)<-c("C1","C2","C3","C4","C5","C6","T1","T2","T3","T4","T5","T6")
+colnames(group)<-c("sample","group")
+for (n in 1:4715) {
+  abundance[n,13]<-sum(abundance[n,1:12])
+  
+}
+otu<-abundance[order(-abundance[,13]),]
+otu<-otu[1:20,1:12]
+for (k in 1:12) {
+  
+for (i in 1:20) {
+  otu_1[i,k]<-otu[i,k]/sum(otu[,k])
+  }
+  }#计算每个样本中各物种丰度值比例，并选出丰度值排名前20进行作图
+tree = hclust(vegan::vegdist(t(otu), method = 'bray'), 
+              method = 'average') %>%
+  as.phylo()
+# 选择节点，方便后续分开上色
+tree = groupClade(tree, .node=c(16))
+groupInfo <- split(group$sample, group$group)
+tree <- groupOTU(tree, groupInfo)
+# 绘制聚类图
+p1 = ggtree(tree, aes(color=group, linetype=group)) + 
+  geom_tiplab(aes(color=group))
+#绘制竖向堆叠图
+  p2=otu %>%
+  mutate(phylum = rownames(otu)) %>%
+  reshape2::melt(id.vars = 'phylum') %>%
+  ggplot(aes(variable, value, fill = phylum))+
+  geom_bar(stat = 'identity', position = 'fill')+
+  scale_x_discrete(limits = c("C1","C2","C3","C4","C5","C6","T1","T2","T3","T4","T5","T6"))+
+  scale_fill_igv()+
+  scale_y_continuous(expand = c(0,0))+
+  scale_y_continuous(labels = scales::percent)+
+  theme_classic()+
+  xlab("Sample") +
+  ylab("Precentage")
+#绘制组合图
+  p2 = p2+theme(axis.ticks.y = element_blank(),
+                axis.title.y = element_blank(), 
+                axis.text.y = element_blank(), 
+                axis.line = element_blank())+coord_flip()
+  ggdraw()+
+    draw_plot(p1, 0, 0.06, 0.45, 0.95)+
+    draw_plot(p2, 0.49, 0, 0.55, 1)
+  
