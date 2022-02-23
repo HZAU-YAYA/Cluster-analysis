@@ -1,5 +1,5 @@
 #时间2022/2/16 作者：徐博雅 版本：v1.0
-library(tidyverse)
+library(dplyr)
 library(ggplot2)
 library(ggtree)
 library(treeio)
@@ -53,7 +53,7 @@ p2
 dev.off()
 #绘制组合图
 treelabel<-p1$data[1:12,]
-treelabel<-treelabel[order(treelabel$y),]#使树状图顺序样品与堆叠图样品顺序相等
+treelabel<-treelabel[order(treelabel$y),]#使树状图样品顺序与堆叠图样品顺序相同
 p2 = p2+theme(axis.ticks.y = element_blank(),
               axis.title.y = element_blank(), 
               axis.text.y = element_blank(), 
