@@ -44,7 +44,6 @@ p2=otu %>%
   theme_classic()+
   xlab("Sample") +
   ylab("relative abundance")
-ggsave("example2.eps",device = cairo_ps)
 png("堆叠图.png")
 p2
 dev.off()
