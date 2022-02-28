@@ -10,12 +10,8 @@ file_1<-args[1]
 file_2<-args[2]
 print(file_1)
 print(file_2)
-
 abundance = read.table(file_1, header=T, row.names=1, sep="\t", comment.char="",quote = "")#导入数据
 group=read.table(file_2, header=T, sep="\t", comment.char="",quote = "")
-
-abundance = read.table('all.abundance_uniform_s.tsv', header=T, row.names=1, sep="\t", comment.char="",quote = "")#导入数据
-group=read.table('group.list', header=T, row.names=1, sep="\t", comment.char="",quote = "")
 otu<-abundance
 for (n in 1:nrow(abundance)) {
   otu[n,length(abundance[1,])+1]<-sum(abundance[n,1:length(abundance[1,])])
