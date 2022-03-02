@@ -77,9 +77,9 @@ p1=p1+xlim(NA,0.8)+theme(legend.position = "none")#修改x轴删除图例，方�
 p3=ggdraw()+
   draw_plot(p1, 0, 0.07, 0.3, 0.84)+
   draw_plot(p2, 0.17, 0, 0.7, 0.9)
-png("组合图.png")
+png("组合图.png",width=1426,height=775)
 p3
 dev.off()
-pdf("组合图.pdf")
+pdf("组合图.pdf",width=19,height=9.2)
 p3
 dev.off()
