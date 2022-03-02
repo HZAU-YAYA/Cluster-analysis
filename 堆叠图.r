@@ -1,48 +1,45 @@
 #时间2022/2/24 作者：徐博雅 版本：v1.1
 library(dplyr)
 library(ggplot2)
+library(ggsci)
 library(ggtree)
 library(treeio)
-library(ggsci)
 library(cowplot)
-args <- commandArgs(trailingOnly = TRUE)
+args <- commandArgs(trailingOnly = TRUE)#调用外部参数
 file_1<-args[1]
 file_2<-args[2]
 print(file_1)
 print(file_2)
+
 abundance = read.table(file_1, header=T, row.names=1, sep="\t", comment.char="",quote = "")#导入数据
 group=read.table(file_2, header=T, sep="\t", comment.char="",quote = "")
 otu<-abundance
 for (n in 1:nrow(abundance)) {
   otu[n,length(abundance[1,])+1]<-sum(abundance[n,1:length(abundance[1,])])
-  
-}
+  }
 otu<-otu[order(-otu[,length(otu[1,])]),]
 otu<-otu[1:20,1:length(otu[1,])-1]
 c<- rownames(otu)
 for (i in 1:20) {
-  w=strsplit(c[i],split = "__")[[1]]
-  c[i]<-w[length(w)]
-}
+    w=strsplit(c[i],split = "__")[[1]]
+    c[i]<-w[length(w)]
+    }
 rownames(otu)<-c #行名太长，故只将种名定义为行名
 #画树
-tree = hclust(vegan::vegdist(t(otu), method = 'bray'), 
+tree = stats::hclust(vegan::vegdist(t(otu), method = 'bray'), 
               method = 'average') %>%
-  as.phylo()
+  tidytree::as.phylo()
 # 选择节点，方便后续分开上色
-tree = groupClade(tree, .node=16)
-groupInfo <- split(group[,1], group[,2])
-tree <- groupOTU(tree, groupInfo)
+tree =tidytree::groupClade(tree, .node=16)
+groupInfo <-base::split(group[,1], group[,2])
+tree <- tidytree::groupOTU(tree, groupInfo)
 # 绘制聚类图
+p1 = ggtree(tree,size=2)
 p1 = ggtree(tree,size=2,aes(color=group, linetype=group)) + 
-geom_tiplab(size=5,aes(color=group))
-png("堆叠图.png")
+  ggtree::geom_tiplab(size=6,aes(color=group))+theme(legend.title = element_text(size = 20),legend.position = "top")
+pdf("树状图.pdf")
 p1
 dev.off()
-pdf("堆叠图.pdf")
-p1
-dev.off()
-#绘制竖向堆叠图
 p2=otu %>%
   mutate(Species = rownames(otu)) %>%
   reshape2::melt(id.vars = 'Species') %>%
@@ -55,6 +52,7 @@ p2=otu %>%
   theme_classic()+
   xlab("Sample") +
   ylab("relative abundance")
+ggsave("example2.eps",device = cairo_ps)
 png("堆叠图.png")
 p2
 dev.off()
@@ -66,21 +64,20 @@ treelabel<-p1$data[1:12,]
 treelabel<-treelabel[order(treelabel$y),]#使树状图顺序样品与堆叠图样品顺序相等
 p2 = p2+theme(axis.ticks.y = element_blank(),
               axis.title.y = element_blank(), 
-              axis.text.x = element_text(size = 12),
               axis.text.y = element_blank(), 
               axis.line = element_blank(),
-              legend.text = element_text(size = 12),
-              legend.title = element_text(size = 16),
-             axis.title=element_text(size = 16))+ scale_x_discrete(limits = treelabel$label)+
+              legend.text = element_text(size = 15),
+              legend.title = element_text(size = 20),
+              axis.title=element_text(size = 20))+ scale_x_discrete(limits = treelabel$label)+
   coord_flip()
-p1=p1+xlim(NA,0.8)+theme(legend.position = "none")#修改x轴删除图例，方便拼接
+
 p3=ggdraw()+
-  draw_plot(p1, 0, 0.07, 0.3, 0.84)+
-  draw_plot(p2, 0.17, 0, 0.7, 0.9)
-png("组合图.png")
+  draw_plot(p1, 0, 0.06, 0.3, 0.95)+
+  draw_plot(p2, 0.3, 0, 0.7, 1)#拼接图片
+png("组合图.png",width = 2300,height = 1121)
 p3
 dev.off()
-pdf("组合图.pdf")
+pdf("组合图.pdf",width = 23.70,height = 11.00)
 p3
 dev.off()
 
