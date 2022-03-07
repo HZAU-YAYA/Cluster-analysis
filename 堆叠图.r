@@ -15,7 +15,7 @@ group=read.table(file_2, header=T, sep="\t", comment.char="",quote = "")
 otu<-abundance
 for (n in 1:nrow(abundance)) {
   otu[n,length(abundance[1,])+1]<-sum(abundance[n,1:length(abundance[1,])])
-
+  
 }
 otu<-otu[order(-otu[,length(otu[1,])]),]
 otu<-otu[1:20,1:length(otu[1,])-1]
@@ -35,11 +35,11 @@ groupInfo <- split(group[,1], group[,2])
 tree <- groupOTU(tree, groupInfo)
 # 绘制聚类图
 p1 = ggtree(tree,size=2,aes(color=group, linetype=group)) + 
-geom_tiplab(size=5,aes(color=group))
-png("堆叠图.png")
+  geom_tiplab(size=5,aes(color=group))
+png("树状图.png")
 p1
 dev.off()
-pdf("堆叠图.pdf")
+pdf("树状图.pdf")
 p1
 dev.off()
 #绘制竖向堆叠图
@@ -71,7 +71,7 @@ p2 = p2+theme(axis.ticks.y = element_blank(),
               axis.line = element_blank(),
               legend.text = element_text(size = 12),
               legend.title = element_text(size = 16),
-             axis.title=element_text(size = 16))+ scale_x_discrete(limits = treelabel$label)+
+              axis.title=element_text(size = 16))+ scale_x_discrete(limits = treelabel$label)+
   coord_flip()
 p1=p1+xlim(NA,0.8)+theme(legend.position = "none")#修改x轴删除图例，方便拼接
 p3=ggdraw()+
@@ -83,3 +83,4 @@ dev.off()
 pdf("组合图.pdf",width=19,height=9.2)
 p3
 dev.off()
+
