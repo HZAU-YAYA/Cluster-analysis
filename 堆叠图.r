@@ -62,7 +62,7 @@ pdf("堆叠图.pdf")
 p2
 dev.off()
 #绘制组合图
-treelabel<-p1$data[1:12,]
+treelabel<-p1$data[1:nrow(otu),]
 treelabel<-treelabel[order(treelabel$y),]#使树状图顺序样品与堆叠图样品顺序相等
 p2 = p2+theme(axis.ticks.y = element_blank(),
               axis.title.y = element_blank(), 
